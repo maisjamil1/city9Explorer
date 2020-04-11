@@ -104,7 +104,6 @@ function movieshandler(request, response) {
 
 
 function moviesCONS(movie$) {
-
     this.title = movie$.title;
     this.overview = movie$.overview;
     this.average_votes = movie$.vote_average;
@@ -113,6 +112,40 @@ function moviesCONS(movie$) {
     this.popularity = movie$.popularity;
     this.released_on = movie$.release_date;
 }
+
+
+
+
+// *************************************************************
+app.get('/yelp', yelphandler);
+
+function yelphandler(request, response) {
+    // ${process.env.YELP_API_KEY}
+    superagent(`https://api.yelp.com/v3/businesses/search?location=${request.query.search_query}`).set({ "Authorization": `Bearer ${process.env.YELP_API_KEY}`})
+        .then((yelpRes) => {
+            
+            console.log(yelpRes);
+            const yelpSummaries = yelpRes.body.businesses.map((yelp$) => {
+                return new yelpCONS(yelp$);
+            });
+            response.status(200).json(yelpSummaries);
+        })
+        .catch((errT) => errorHandler(errT, request, response));
+}
+
+
+function yelpCONS(yelp$) {
+    this.name =yelp$.name;
+    this.image_url = yelp$.image_url;
+    this.price = yelp$.price;
+    this.rating= yelp$.rating;
+    this.url= yelp$.url;
+}
+
+
+
+
+
 
 
 
